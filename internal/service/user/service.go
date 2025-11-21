@@ -13,6 +13,13 @@ type UserService struct {
 	jwtManger *auth.JWTManager
 }
 
+func NewUserService(repo *repository.UserRepo, jwtManager *auth.JWTManager) *UserService {
+	return &UserService{
+		repo:      repo,
+		jwtManger: jwtManager,
+	}
+}
+
 func NewUserServiceHash(repo *repository.UserRepo) *UserService {
 
 	return &UserService{

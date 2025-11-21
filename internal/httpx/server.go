@@ -2,14 +2,21 @@ package httpx
 
 import (
 	"JWTproject/internal/auth"
+	"JWTproject/internal/repository"
+	"errors"
 	"github.com/go-chi/chi"
+	"net/http"
 )
 
 type HTTPServer struct {
 	Handlers *HTTPHandlers
 }
 
-func (s *HTTPServer) Start(jwtManager *auth.JWTManager) {
+func NewHTTPServer(handlers *HTTPHandlers) *HTTPServer {
+	return &HTTPServer{Handlers: handlers}
+}
+
+func (s *HTTPServer) Start(port string, jwtManager *auth.JWTManager, userRepo *repository.UserRepo) error {
 
 	router := chi.NewRouter()
 	//register
@@ -20,7 +27,7 @@ func (s *HTTPServer) Start(jwtManager *auth.JWTManager) {
 
 	router.Group(func(r chi.Router) {
 
-		r.Use(auth.JWTAuthMiddleware(jwtManager))
+		r.Use(auth.JWTAuthMiddleware(jwtManager, userRepo))
 
 		r.Get("/user", s.Handlers.GetUserHandler)
 
@@ -29,4 +36,11 @@ func (s *HTTPServer) Start(jwtManager *auth.JWTManager) {
 		r.Delete("/user", s.Handlers.DeleteUserHandler)
 	})
 
+	if err := http.ListenAndServe(port, router); err != nil {
+		if errors.Is(err, http.ErrServerClosed) {
+			return nil
+		}
+		return err
+	}
+	return nil
 }

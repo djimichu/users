@@ -8,10 +8,10 @@ import (
 
 type JWTManager struct {
 	secret   string
-	expHours int
+	expHours time.Duration
 }
 
-func NewJWTManager(secret string, exp int) *JWTManager {
+func NewJWTManager(secret string, exp time.Duration) *JWTManager {
 	return &JWTManager{
 		secret:   secret,
 		expHours: exp,
@@ -21,7 +21,7 @@ func (m *JWTManager) Generate(userID uuid.UUID) (string, error) {
 
 	claims := jwt.MapClaims{
 		"user_id": userID.String(),
-		"exp":     time.Now().Add(time.Duration(m.expHours) * time.Hour).Unix(),
+		"exp":     time.Now().Add(m.expHours).Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

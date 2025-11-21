@@ -2,50 +2,41 @@ package config
 
 import (
 	"fmt"
-	"gopkg.in/yaml.v3"
-	"os"
+	"github.com/caarlos0/env"
+	"time"
 )
 
-const path = "config/config.yaml"
-
 type Config struct {
-	App struct {
-		Env string `yaml:"env"`
-	} `yaml:"app"`
+	AppEnv string `env:"APP_ENV" envDefault:"local"`
 
-	JWT struct {
-		Secret   string `yaml:"secret"`
-		ExpHours int    `yaml:"exp_hours"`
-	} `yaml:"jwt"`
+	// HTTP
+	HTTPPort string `env:"HTTP_PORT" envDefault:":9091"`
 
-	DB struct {
-		Host     string `yaml:"host"`
-		Port     int    `yaml:"port"`
-		User     string `yaml:"user"`
-		Password string `yaml:"password"`
-		Name     string `yaml:"name"`
-	} `yaml:"db"`
+	// JWT
+	JWTSecret   string        `env:"JWT_SECRET" envDefault:"fallback-secret-change-me"`
+	JWTExpHours time.Duration `env:"JWT_EXP_HOURS" envDefault:"15m"`
+
+	// Database
+	DBHost     string `env:"DB_HOST" envDefault:"localhost"`
+	DBPort     int    `env:"DB_PORT" envDefault:"5432"`
+	DBUser     string `env:"DB_USER" envDefault:"postgres"`
+	DBPassword string `env:"DB_PASSWORD" envDefault:""`
+	DBName     string `env:"DB_NAME" envDefault:"myapp"`
 }
 
-func LoadConfig(path string) (*Config, error) {
-
+func LoadConfig() (*Config, error) {
 	cfg := &Config{}
-
-	data, err := os.ReadFile(path)
-	if err != nil {
-		return nil, err
-	}
-	if err := yaml.Unmarshal(data, cfg); err != nil {
+	if err := env.Parse(cfg); err != nil {
 		return nil, err
 	}
 	return cfg, nil
 }
 func (c *Config) DSN() string {
 	return fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
-		c.DB.User,
-		c.DB.Password,
-		c.DB.Host,
-		c.DB.Port,
-		c.DB.Name,
+		c.DBUser,
+		c.DBPassword,
+		c.DBHost,
+		c.DBPort,
+		c.DBName,
 	)
 }

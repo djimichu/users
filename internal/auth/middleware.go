@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"JWTproject/internal/repository"
 	"context"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
@@ -12,7 +13,7 @@ type contextKey string
 
 const userIDKey = contextKey("userID")
 
-func JWTAuthMiddleware(jwtManager *JWTManager) func(handler http.Handler) http.Handler {
+func JWTAuthMiddleware(jwtManager *JWTManager, userRepo *repository.UserRepo) func(handler http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
@@ -53,6 +54,12 @@ func JWTAuthMiddleware(jwtManager *JWTManager) func(handler http.Handler) http.H
 			userID, err := uuid.Parse(idStr)
 			if err != nil {
 				http.Error(w, "invalid userID in token", http.StatusUnauthorized)
+				return
+			}
+			//проверяем наличие пользователя в БД
+			user, err := userRepo.GetUserByID(userID)
+			if err != nil || user == "" {
+				http.Error(w, "user not found", http.StatusUnauthorized)
 				return
 			}
 

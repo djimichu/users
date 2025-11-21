@@ -9,6 +9,13 @@ type UserUpdateNameDTO struct {
 	Name string `json:"name"`
 }
 
+func (u UserUpdateNameDTO) Validate() error {
+	if len(u.Name) < 4 {
+		return ErrShortName
+	}
+	return nil
+}
+
 func (u UserRequestDto) Validate() error {
 
 	switch {

@@ -14,6 +14,10 @@ type HTTPHandlers struct {
 	userService *user.UserService
 }
 
+func NewHTTPHandlers(userService *user.UserService) *HTTPHandlers {
+	return &HTTPHandlers{userService: userService}
+}
+
 func (h *HTTPHandlers) CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	var userHttp models.UserRequestDto
@@ -75,6 +79,11 @@ func (h *HTTPHandlers) ChangeUsernameHandler(w http.ResponseWriter, r *http.Requ
 	var updateUser models.UserUpdateNameDTO
 
 	if err := json.NewDecoder(r.Body).Decode(&updateUser); err != nil {
+		response.WriteHttpError(w, err, http.StatusBadRequest)
+		return
+	}
+
+	if err := updateUser.Validate(); err != nil {
 		response.WriteHttpError(w, err, http.StatusBadRequest)
 		return
 	}
