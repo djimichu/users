@@ -7,13 +7,13 @@ type UserHttpDTO struct {
 	Name         string
 	PasswordHash string
 }
-type UserHashDTO struct {
+type UserNamePassForDB struct {
 	Name         string
 	PasswordHash string
 }
 
-func NewUserHashDto(name, passHash string) UserHashDTO {
-	return UserHashDTO{
+func NewUserHashDto(name, passHash string) UserNamePassForDB {
+	return UserNamePassForDB{
 		Name:         name,
 		PasswordHash: passHash,
 	}

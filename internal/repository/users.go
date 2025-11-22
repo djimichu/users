@@ -14,7 +14,7 @@ func NewUserRepo(db *sql.DB) *UserRepo {
 	return &UserRepo{db: db}
 }
 
-func (u *UserRepo) CreateUser(user models.UserHashDTO) (uuid.UUID, error) {
+func (u *UserRepo) CreateUser(user models.UserNamePassForDB) (uuid.UUID, error) {
 
 	var id uuid.UUID
 	query := `
@@ -23,6 +23,7 @@ func (u *UserRepo) CreateUser(user models.UserHashDTO) (uuid.UUID, error) {
         RETURNING id
     `
 	err := u.db.QueryRow(query, user.Name, user.PasswordHash).Scan(&id)
+
 	if err != nil {
 		return uuid.Nil, err
 	}
