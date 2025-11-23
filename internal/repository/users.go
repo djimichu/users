@@ -116,13 +116,14 @@ func (u *UserRepo) ChangeUserNameById(id uuid.UUID, name string) (string, error)
 		UPDATE users
 		SET username = $1
 		WHERE id = $2
+		RETURNING username
 	`
 	err := u.db.QueryRow(query, name, id).Scan(&updatedName)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return "", ErrNotFoundUser
-		}
 		return "", err
+	}
+	if updatedName == "" {
+		return "", ErrNotFoundUser
 	}
 
 	logger.Logger.Debug("Database query executed",

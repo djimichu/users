@@ -168,7 +168,7 @@ func (s *UserService) ChangeUserName(id uuid.UUID, name string) (*models.GetUser
 	updatedName, err := s.repo.ChangeUserNameById(id, name)
 	if err != nil {
 		if errors.Is(err, repository.ErrNotFoundUser) {
-			logger.Logger.Warn("failed get user from DB, this user_id not exist",
+			logger.Logger.Warn("failed change username from DB, this user_id not exist",
 				zap.String("id", id.String()),
 				zap.String("name", name),
 			)
