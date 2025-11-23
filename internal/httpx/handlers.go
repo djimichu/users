@@ -4,6 +4,7 @@ import (
 	"JWTproject/internal/auth"
 	"JWTproject/internal/httpx/response"
 	"JWTproject/internal/models"
+	"JWTproject/internal/repository"
 	"JWTproject/internal/service/user"
 	"encoding/json"
 	"errors"
@@ -68,6 +69,10 @@ func (h *HTTPHandlers) GetUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	userDTO, err := h.userService.GetUserByID(id)
 	if err != nil {
+		if errors.Is(err, repository.ErrNotFoundUser) {
+			response.WriteHttpError(w, err, http.StatusNotFound)
+			return
+		}
 		response.WriteHttpError(w, err, http.StatusInternalServerError)
 		return
 	}
@@ -96,15 +101,16 @@ func (h *HTTPHandlers) ChangeUsernameHandler(w http.ResponseWriter, r *http.Requ
 
 	userDTO, err := h.userService.ChangeUserName(id, updateUser.Name)
 	if err != nil {
+		if errors.Is(err, repository.ErrNotFoundUser) {
+			response.WriteHttpError(w, err, http.StatusNotFound)
+			return
+		}
 		response.WriteHttpError(w, err, http.StatusInternalServerError)
 		return
 	}
 
 	response.WriteJSON(w, userDTO, http.StatusOK)
 }
-
-// 204
-
 func (h *HTTPHandlers) DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	id, ok := auth.UserIDFromContext(r.Context())
@@ -115,6 +121,10 @@ func (h *HTTPHandlers) DeleteUserHandler(w http.ResponseWriter, r *http.Request)
 
 	err := h.userService.DeleteUserByID(id)
 	if err != nil {
+		if errors.Is(err, repository.ErrNotFoundUser) {
+			response.WriteHttpError(w, err, http.StatusNotFound)
+			return
+		}
 		response.WriteHttpError(w, err, http.StatusInternalServerError)
 		return
 	}
