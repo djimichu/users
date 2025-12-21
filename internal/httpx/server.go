@@ -27,7 +27,7 @@ func (s *HTTPServer) Start(port string, jwtManager *auth.JWTManager, userRepo *r
 
 	router.Group(func(r chi.Router) {
 
-		r.Use(auth.JWTAuthMiddleware(jwtManager, userRepo))
+		r.Use(JWTAuthMiddleware(jwtManager, userRepo))
 
 		r.Get("/user", s.Handlers.GetUserHandler)
 

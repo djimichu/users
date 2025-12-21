@@ -1,6 +1,7 @@
-package auth
+package httpx
 
 import (
+	"JWTproject/internal/auth"
 	"JWTproject/internal/logger"
 	"JWTproject/internal/repository"
 	"context"
@@ -16,7 +17,7 @@ type contextKey string
 
 const userIDKey = contextKey("userID")
 
-func JWTAuthMiddleware(jwtManager *JWTManager, userRepo *repository.UserRepo) func(handler http.Handler) http.Handler {
+func JWTAuthMiddleware(jwtManager *auth.JWTManager, userRepo *repository.UserRepo) func(handler http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 

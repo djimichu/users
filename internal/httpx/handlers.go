@@ -1,7 +1,6 @@
 package httpx
 
 import (
-	"JWTproject/internal/auth"
 	"JWTproject/internal/httpx/response"
 	"JWTproject/internal/models"
 	"JWTproject/internal/repository"
@@ -59,9 +58,10 @@ func (h *HTTPHandlers) LoginUserHandler(w http.ResponseWriter, r *http.Request) 
 
 	response.WriteJSON(w, resp, http.StatusOK)
 }
+
 func (h *HTTPHandlers) GetUserHandler(w http.ResponseWriter, r *http.Request) {
 
-	id, ok := auth.UserIDFromContext(r.Context())
+	id, ok := UserIDFromContext(r.Context())
 	if !ok {
 		response.WriteHttpError(w, errors.New("user_id not found"), http.StatusUnauthorized)
 		return
@@ -93,7 +93,7 @@ func (h *HTTPHandlers) ChangeUsernameHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	id, ok := auth.UserIDFromContext(r.Context())
+	id, ok := UserIDFromContext(r.Context())
 	if !ok {
 		response.WriteHttpError(w, errors.New("user_id not found"), http.StatusUnauthorized)
 		return
@@ -113,7 +113,7 @@ func (h *HTTPHandlers) ChangeUsernameHandler(w http.ResponseWriter, r *http.Requ
 }
 func (h *HTTPHandlers) DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
 
-	id, ok := auth.UserIDFromContext(r.Context())
+	id, ok := UserIDFromContext(r.Context())
 	if !ok {
 		response.WriteHttpError(w, errors.New("user_id not found"), http.StatusUnauthorized)
 		return
